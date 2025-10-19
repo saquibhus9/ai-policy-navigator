@@ -27,3 +27,15 @@ An **AI-powered Policy Navigator Chatbot** that helps users **search, understand
 
 
 
+# AI-POLICY NAVIGATOR
+
+## Screenshots
+
+### Code Setup
+![Code Setup](screenshots/code_setup.png)
+
+### Policies
+![Policy 1](screenshots/policy_1.png)
+![Policy 2](screenshots/policy_2.png)
+![Policy 3](screenshots/policy_3.png)
+![Policy 4](screenshots/policy_4.png)
