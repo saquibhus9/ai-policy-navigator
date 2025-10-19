@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Policy Navigator</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #loading {
+      display: none;
+      margin-top: 10px;
+      font-style: italic;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="glass-box">
+      <h1>Policy Navigator</h1>
+      <p>Ask anything about Indian laws, schemes, or acts</p>
+
+      <input type="text" id="query" placeholder="e.g., What is PM-KISAN?" />
+      <button onclick="askPolicy()">Ask</button>
+
+      <div id="loading">⏳ Generating answer...</div>
+      <div id="response"></div>
+
+      <div class="upload-section glass-upload">
+        <h3>📄 Upload Policy PDF</h3>
+
+        <label for="pdfFile" class="custom-file-upload">
+          <span>📎 Choose PDF File</span>
+        </label>
+        <input type="file" id="pdfFile" accept="application/pdf" hidden />
+        <p id="fileName">No file chosen</p>
+
+        <button class="upload-btn" onclick="uploadPDF()">📤 Upload</button>
+        <p id="uploadStatus"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function askPolicy() {
+      const question = document.getElementById('query').value;
+      const responseBox = document.getElementById('response');
+      const loading = document.getElementById('loading');
+
+      if (!question.trim()) {
+        responseBox.innerText = "⚠️ Please enter a question.";
+        return;
+      }
+
+      loading.style.display = "block";
+      responseBox.innerText = "";
+
+      try {
+        const res = await fetch('http://localhost:8000/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+
+        const data = await res.json();
+        responseBox.innerText = data.answer || "⚠️ No response received.";
+      } catch (err) {
+        responseBox.innerText = "❌ Failed to connect to backend.";
+      } finally {
+        loading.style.display = "none";
+      }
+    }
+
+    async function uploadPDF() {
+      const fileInput = document.getElementById("pdfFile");
+      const status = document.getElementById("uploadStatus");
+
+      if (fileInput.files.length === 0) {
+        status.innerText = "⚠️ Please select a PDF file.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      status.innerText = "⏳ Uploading...";
+
+      try {
+        const response = await fetch("http://localhost:8000/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (result.message) {
+          status.innerText = result.message;
+        } else {
+          status.innerText = "❌ Upload failed: " + result.error;
+        }
+      } catch (err) {
+        status.innerText = "❌ Error uploading file.";
+      }
+    }
+
+    // Show selected file name
+    const fileInput = document.getElementById("pdfFile");
+    const fileNameDisplay = document.getElementById("fileName");
+
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      fileNameDisplay.innerText = file ? file.name : "No file chosen";
+    });
+
+  </script>
+</body>
+</html>

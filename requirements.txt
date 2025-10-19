@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+google-generativeai
+PyMuPDF
+faiss-cpu
+sentence-transformers
+python-multipart
+uvicorn app:app --reload
